@@ -42,4 +42,16 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user is an administrator.
+     *
+     * "role" is not mass assignable, so it is forced after the row is created.
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->forceFill(['role' => User::ROLE_ADMIN])->save();
+        });
+    }
 }

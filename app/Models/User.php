@@ -14,7 +14,20 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * The role that may create, edit and delete products.
+     */
+    public const ROLE_ADMIN = 'admin';
+
+    /**
+     * The default role for newly registered accounts.
+     */
+    public const ROLE_USER = 'user';
+
+    /**
      * The attributes that are mass assignable.
+     *
+     * "role" is deliberately absent: it must never be filled from request data,
+     * otherwise a visitor could register themselves as an administrator.
      *
      * @var list<string>
      */
@@ -45,5 +58,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Determine whether the account is an administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 }

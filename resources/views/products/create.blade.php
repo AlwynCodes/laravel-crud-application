@@ -20,11 +20,12 @@
             </div>
 
             <!-- Form -->
-            <form method="post" action="{{ route('product.store') }}" class="p-6 space-y-4">
+            <form method="post" action="{{ route('product.store') }}" enctype="multipart/form-data" class="p-6 space-y-4">
                 @csrf
 
                 @if($errors->any())
                     <div class="p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+                        <p class="font-semibold mb-1">Please fix the following {{ $errors->count() }} error(s):</p>
                         <ul class="list-disc list-inside">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -35,30 +36,53 @@
 
                 <!-- Name -->
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Product Name *</label>
-                    <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Aqua Flask Tumbler"
-                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">
+                    <label for="name" class="block text-sm font-bold text-gray-700 mb-1">Product Name *</label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="e.g. Aqua Flask Tumbler"
+                           class="w-full border @error('name') border-red-400 @else border-gray-300 @enderror rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">
+                    @error('name')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Qty + Price -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Quantity *</label>
-                        <input type="number" name="qty" value="{{ old('qty') }}" placeholder="0"
-                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">
+                        <label for="qty" class="block text-sm font-bold text-gray-700 mb-1">Quantity *</label>
+                        <input type="number" id="qty" name="qty" value="{{ old('qty') }}" placeholder="0"
+                               class="w-full border @error('qty') border-red-400 @else border-gray-300 @enderror rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">
+                        @error('qty')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Price (₱) *</label>
-                        <input type="number" step="0.01" name="price" value="{{ old('price') }}" placeholder="0.00"
-                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">
+                        <label for="price" class="block text-sm font-bold text-gray-700 mb-1">Price (&#8369;) *</label>
+                        <input type="number" step="0.01" id="price" name="price" value="{{ old('price') }}" placeholder="0.00"
+                               class="w-full border @error('price') border-red-400 @else border-gray-300 @enderror rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">
+                        @error('price')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
                 <!-- Description -->
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Description</label>
-                    <textarea name="description" rows="3" placeholder="Brief description..."
-                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">{{ old('description') }}</textarea>
+                    <label for="description" class="block text-sm font-bold text-gray-700 mb-1">Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Brief description..."
+                              class="w-full border @error('description') border-red-400 @else border-gray-300 @enderror rounded px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:border-blue-500">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Image -->
+                <div>
+                    <label for="image" class="block text-sm font-bold text-gray-700 mb-1">Product Image</label>
+                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp"
+                           class="w-full border @error('image') border-red-400 @else border-gray-300 @enderror rounded px-3 py-2 text-sm text-gray-700 bg-white file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <p class="mt-1 text-xs text-gray-500">Optional. JPEG, PNG or WebP, up to 2 MB.</p>
+                    @error('image')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Buttons -->
@@ -68,8 +92,7 @@
                         Cancel
                     </a>
                     <button type="submit"
-                            class="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded hover:bg-gray-300"
-                            style="color: black !important;">
+                            class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition">
                         Create Product
                     </button>
                 </div>

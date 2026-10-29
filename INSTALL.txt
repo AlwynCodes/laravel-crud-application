@@ -1,0 +1,70 @@
+LABORATORY NO. 4 — INSTALLATION
+
+This folder is the complete, tested version of laravel-crud-application with all
+four enhancements from the lab sheet:
+
+  1. Server-side validation (Form Requests + per-field errors)
+  2. Product image upload, replacement and deletion
+  3. Role-based authorization (admin / user)
+  4. Search + pagination
+
+It keeps your original structure: `qty` column, `product.*` route names,
+blue/amber Tailwind pages.
+
+------------------------------------------------------------------
+INSTALL (PowerShell, inside C:\Users\alwyn reuyan\laravel-crud-application)
+------------------------------------------------------------------
+
+1. Back up your current work first (git commit), then copy these files over your
+   project folder — overwrite when asked. Keep your own `.env` and `vendor`
+   folder; they are not included here.
+
+2. Run:
+
+       php artisan migrate:fresh --seed
+       php artisan storage:link
+       php artisan optimize:clear
+       npm run build          (only needed if you change CSS/Blade classes)
+
+3. Start the server:
+
+       php artisan serve
+
+4. Log in with:
+
+       admin@example.com   / password    (can create, edit, delete)
+       user@example.com    / password    (can only browse)
+
+------------------------------------------------------------------
+WHAT IS WHERE
+------------------------------------------------------------------
+
+app/Http/Controllers/ProductController.php   controller with search, pagination,
+                                             image handling and authorization
+app/Http/Requests/StoreProductRequest.php    validation rules (create)
+app/Http/Requests/UpdateProductRequest.php   validation rules (update)
+app/Http/Services/ProductImageService.php    store/delete files on the public disk
+app/Policies/ProductPolicy.php               who may create/update/delete
+app/Http/Middleware/EnsureUserIsAdmin.php    blocks non-admins before the controller
+app/Models/User.php                          ROLE_ADMIN / ROLE_USER + isAdmin()
+app/Models/Product.php                       hasImage() / imageUrl()
+
+database/migrations/2026_10_29_150000_add_role_to_users_table.php
+database/migrations/2026_10_29_150001_add_image_path_to_products_table.php
+
+resources/views/products/index.blade.php     search, pagination, thumbnails, @can
+resources/views/products/create.blade.php    upload field + per-field errors
+resources/views/products/edit.blade.php      replace image + preview
+resources/views/products/show.blade.php      NEW detail page
+resources/views/errors/403.blade.php         friendly "admin only" page
+
+tests/Feature/ProductValidationTest.php      10 tests
+tests/Feature/ProductAuthorizationTest.php   9 tests
+tests/Feature/ProductImageTest.php           9 tests
+tests/Feature/ProductSearchTest.php          6 tests
+
+Run them with:
+
+       php artisan test
+
+Expected: 60 passed.

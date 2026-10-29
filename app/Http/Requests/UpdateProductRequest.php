@@ -6,6 +6,9 @@ use App\Models\Product;
 
 class UpdateProductRequest extends StoreProductRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         $product = $this->route('product');
