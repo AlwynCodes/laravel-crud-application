@@ -17,6 +17,8 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600"><?php echo e(auth()->user()->email); ?></span>
+
                 <?php if(auth()->user()->isAdmin()): ?>
                     <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">Admin</span>
                 <?php else: ?>
@@ -29,11 +31,19 @@
                         + Add Product
                     </a>
                 <?php endif; ?>
-
-                <a href="<?php echo e(url('/dashboard')); ?>"
+                
+                <a href="<?php echo e(route('profile.edit')); ?>"
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm shadow-sm">
-                    Dashboard
+                    Profile
                 </a>
+
+                <form method="POST" action="<?php echo e(route('logout')); ?>">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit"
+                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm shadow-sm">
+                        Log Out
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -174,15 +184,16 @@
 
         <!-- Pagination + summary -->
         <?php if($products->total() > 0): ?>
-            <div class="mt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p class="text-sm text-gray-600">
+            <?php if($products->hasPages()): ?>
+                <div class="mt-5 flex justify-center">
+                    <?php echo e($products->links()); ?>
+
+                </div>
+            <?php else: ?>
+                <p class="mt-5 text-sm text-gray-600">
                     Showing <?php echo e($products->firstItem()); ?>&ndash;<?php echo e($products->lastItem()); ?> of <?php echo e($products->total()); ?> products
                 </p>
-
-                <?php if($products->hasPages()): ?>
-                    <div><?php echo e($products->links()); ?></div>
-                <?php endif; ?>
-            </div>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 </body>
