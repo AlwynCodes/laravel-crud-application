@@ -2,57 +2,125 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Services\ProductImageService;
+use Illuminate\Http\Request;
+use Throwable;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function __construct(private readonly ProductImageService $images)
     {
-        $products = Product::all();
-        return view('products.index', ['products' => $products]);
+    }
+
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', Product::class);
+
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $search = trim($validated['search'] ?? '');
+
+        $products = Product::query()
+            ->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.$search.'%'))
+            ->latest()
+            ->paginate(8)
+            ->withQueryString();
+
+        return view('products.index', [
+            'products' => $products,
+            'search' => $search,
+        ]);
     }
 
     public function create()
     {
+        $this->authorize('create', Product::class);
+
         return view('products.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'qty' => 'required|integer',
-            'price' => 'required|decimal:0,2',
-            'description' => 'nullable'
-        ]);
+        $this->authorize('create', Product::class);
 
-        $newProduct = Product::create($data);
+        $data = $request->safe()->except('image');
+        $imagePath = null;
 
-        return redirect(route('product.index'));
+        if ($request->hasFile('image')) {
+            $imagePath = $this->images->store($request->file('image'));
+            $data['image_path'] = $imagePath;
+        }
+
+        try {
+            Product::create($data);
+        } catch (Throwable $e) {
+            // Don't leave an orphaned file behind if the insert fails.
+            $this->images->delete($imagePath);
+
+            throw $e;
+        }
+
+        return redirect()->route('product.index')->with('success', 'Product created successfully');
+    }
+
+    public function show(Product $product)
+    {
+        $this->authorize('view', $product);
+
+        return view('products.show', ['product' => $product]);
     }
 
     public function edit(Product $product)
     {
+        $this->authorize('update', $product);
+
         return view('products.edit', ['product' => $product]);
     }
 
-    public function update(Product $product, Request $request)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'qty' => 'required|integer',
-            'price' => 'required|decimal:0,2',
-            'description' => 'nullable',
-        ]);
+        $this->authorize('update', $product);
 
-        $product->update($data);
-        return redirect(route('product.index'))->with('success', 'Product Updated Successfully');
+        $data = $request->safe()->except('image');
+        $oldPath = $product->image_path;
+        $newPath = null;
+
+        if ($request->hasFile('image')) {
+            $newPath = $this->images->store($request->file('image'));
+            $data['image_path'] = $newPath;
+        }
+
+        try {
+            $product->update($data);
+        } catch (Throwable $e) {
+            $this->images->delete($newPath);
+
+            throw $e;
+        }
+
+        if ($newPath !== null) {
+            // The replacement is safely saved, so the old file can go.
+            $this->images->delete($oldPath);
+        }
+
+        return redirect()->route('product.index')->with('success', 'Product updated successfully');
     }
 
     public function destroy(Product $product)
     {
+        $this->authorize('delete', $product);
+
+        $imagePath = $product->image_path;
+
+        // Row first: an orphaned file is harmless, a broken image is not.
         $product->delete();
-        return redirect(route('product.index'))->with('success', 'Product Deleted Successfully');
+        $this->images->delete($imagePath);
+
+        return redirect()->route('product.index')->with('success', 'Product deleted successfully');
     }
 }
