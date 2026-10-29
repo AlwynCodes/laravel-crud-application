@@ -33,6 +33,14 @@
                     </form>
                 </div>
             @endcan
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                        class="px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-lg">
+                    Log Out
+                </button>
+            </form>
         </div>
 
         @if (session('success'))

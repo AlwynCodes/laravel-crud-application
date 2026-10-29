@@ -17,6 +17,8 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600">{{ auth()->user()->email }}</span>
+
                 @if (auth()->user()->isAdmin())
                     <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">Admin</span>
                 @else
@@ -30,10 +32,13 @@
                     </a>
                 @endcan
 
-                <a href="{{ url('/dashboard') }}"
-                   class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm shadow-sm">
-                    Dashboard
-                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm shadow-sm">
+                        Log Out
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -171,15 +176,15 @@
 
         <!-- Pagination + summary -->
         @if ($products->total() > 0)
-            <div class="mt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p class="text-sm text-gray-600">
+            @if ($products->hasPages())
+                <div class="mt-5 flex justify-center">
+                    {{ $products->links() }}
+                </div>
+            @else
+                <p class="mt-5 text-sm text-gray-600">
                     Showing {{ $products->firstItem() }}&ndash;{{ $products->lastItem() }} of {{ $products->total() }} products
                 </p>
-
-                @if ($products->hasPages())
-                    <div>{{ $products->links() }}</div>
-                @endif
-            </div>
+            @endif
         @endif
     </div>
 </body>
