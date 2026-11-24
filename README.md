@@ -24,15 +24,18 @@ Laboratory No. 4 (Application Development and Emerging Technologies).
 - Node.js 18 or newer (only needed to rebuild CSS/JS assets)
 - MySQL (XAMPP) or SQLite
 
-## Installation
+## How to run
 
 ```bash
+## Installing
 composer install
 copy .env.example .env
 php artisan key:generate
 php artisan migrate:fresh --seed
 php artisan storage:link
 npm install
+
+## Running
 npm run build
 php artisan serve
 ```
@@ -55,6 +58,24 @@ php artisan test
 60 feature tests cover validation, authorization, image handling, search and pagination
 (183 assertions).
 
-## Screenshots
+# System Screenshots
+## Admin | Dashboard  
+<img width="1919" height="966" alt="image" src="https://github.com/user-attachments/assets/4dc768db-916c-4b8c-83d9-1500022b1e69" />
 
-<img width="582" height="306" alt="Application preview" src="https://github.com/user-attachments/assets/05f33ed7-269d-455f-96af-d8fde31231f8" />
+## Admin | Add Products
+<img width="1919" height="965" alt="image" src="https://github.com/user-attachments/assets/0d1f0659-8506-473e-a4b8-d4d141176766" />
+
+## Admin | Edit Products
+<img width="1919" height="962" alt="image" src="https://github.com/user-attachments/assets/81eb3770-e1bc-4bb0-a835-eabb7801d74e" />
+
+## Admin | View Products
+<img width="1919" height="963" alt="image" src="https://github.com/user-attachments/assets/27e2cd73-94e6-4168-98d3-8ed79eaebddf" />
+
+
+## User | Dashboard
+<img width="1919" height="964" alt="image" src="https://github.com/user-attachments/assets/fcaa4291-c941-4d54-a304-d20ccc35d376" />
+
+## User | View Products
+<img width="1919" height="964" alt="image" src="https://github.com/user-attachments/assets/b21b2284-d810-4bbe-b561-c78efced3781" />
+
+
